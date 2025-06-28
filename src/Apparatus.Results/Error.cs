@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Apparatus.Results;
@@ -8,6 +9,7 @@ namespace Apparatus.Results;
 /// </summary>
 /// <param name="Code">A unique identifier for the error type</param>
 /// <param name="Message">A human-readable description of the error</param>
+[DebuggerDisplay("{Code}: {Message}")]
 public abstract record Error(string Code, string Message)
 {
     /// <summary>

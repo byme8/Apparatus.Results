@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace Apparatus.Results;
 
@@ -7,6 +8,7 @@ namespace Apparatus.Results;
 /// This type provides a functional approach to error handling without throwing exceptions.
 /// </summary>
 /// <typeparam name="T">The type of the success value</typeparam>
+[DebuggerDisplay("{IsSuccess ? \"Success: \" + _value : \"Error: \" + _error}")]
 public readonly struct Result<T>
 {
     private readonly T? _value;
@@ -145,5 +147,14 @@ public readonly struct Result<T>
             action(_error!);
         }
         return this;
+    }
+
+    /// <summary>
+    /// Returns a string representation of the Result.
+    /// </summary>
+    /// <returns>A string indicating success with value or error with details</returns>
+    public override string ToString()
+    {
+        return _isSuccess ? $"Success: {_value}" : $"Error: {_error}";
     }
 }
