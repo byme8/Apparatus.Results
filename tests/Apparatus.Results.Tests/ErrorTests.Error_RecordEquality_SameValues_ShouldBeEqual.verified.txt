@@ -1,0 +1,4 @@
+﻿{
+  AreEqual: true,
+  HashCodesEqual: true
+}

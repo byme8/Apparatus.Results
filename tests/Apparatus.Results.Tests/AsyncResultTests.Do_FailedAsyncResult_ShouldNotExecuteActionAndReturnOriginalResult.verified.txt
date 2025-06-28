@@ -1,0 +1,11 @@
+﻿{
+  executed: false,
+  result: {
+    IsSuccess: false,
+    IsError: true,
+    Error: {
+      Code: TEST,
+      Message: Test error
+    }
+  }
+}

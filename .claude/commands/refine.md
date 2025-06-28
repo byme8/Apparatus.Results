@@ -1,0 +1,1 @@
+Think about what you you learned during this session and what can be added to CLAUDE.md file for future references.

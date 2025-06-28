@@ -1,0 +1,10 @@
+﻿{
+  ValidationError: {
+    Code: Validation,
+    Message: Field 'Email' is invalid: Invalid format
+  },
+  NotFoundError: {
+    Code: NotFound,
+    Message: User with ID '123' was not found
+  }
+}

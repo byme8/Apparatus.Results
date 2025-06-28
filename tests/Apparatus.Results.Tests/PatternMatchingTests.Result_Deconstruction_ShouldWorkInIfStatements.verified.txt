@@ -1,0 +1,5 @@
+﻿[
+  Successful case: Success - 42,
+  Validation error: Error - Validation,
+  Not found error: Error - NotFound
+]

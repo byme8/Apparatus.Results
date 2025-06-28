@@ -1,0 +1,19 @@
+﻿[
+  {
+    IsSuccess: true,
+    IsError: false,
+    Type: Success
+  },
+  {
+    Index: 1,
+    IsSuccess: false,
+    IsError: true,
+    Type: ValidationError
+  },
+  {
+    Index: 2,
+    IsSuccess: true,
+    IsError: false,
+    Type: Success
+  }
+]

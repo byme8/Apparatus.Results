@@ -1,0 +1,9 @@
+﻿{
+  executed: true,
+  capturedValue: 42,
+  result: {
+    IsSuccess: true,
+    IsError: false,
+    Value: 42
+  }
+}

@@ -1,0 +1,8 @@
+﻿{
+  result: {
+    IsSuccess: true,
+    IsError: false,
+    Value: Large: 10
+  },
+  sideEffectExecuted: true
+}

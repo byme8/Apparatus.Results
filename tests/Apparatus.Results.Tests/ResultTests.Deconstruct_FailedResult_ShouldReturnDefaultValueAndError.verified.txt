@@ -1,0 +1,6 @@
+﻿{
+  error: {
+    Code: TEST,
+    Message: Test error
+  }
+}

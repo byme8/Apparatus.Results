@@ -1,0 +1,3 @@
+﻿{
+  ExceptionMessage: Cannot access error of successful result
+}

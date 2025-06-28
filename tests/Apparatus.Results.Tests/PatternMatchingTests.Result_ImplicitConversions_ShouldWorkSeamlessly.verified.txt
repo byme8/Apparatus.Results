@@ -1,0 +1,22 @@
+﻿[
+  {
+    Type: Int Success,
+    IsSuccess: true,
+    Value: 42
+  },
+  {
+    Type: Int Error,
+    IsSuccess: false,
+    Value: Validation
+  },
+  {
+    Type: String Success,
+    IsSuccess: true,
+    Value: Hello
+  },
+  {
+    Type: String Error,
+    IsSuccess: false,
+    Value: NotFound
+  }
+]
