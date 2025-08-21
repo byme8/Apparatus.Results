@@ -1,5 +1,4 @@
 ﻿{
   IsSuccess: true,
-  IsError: false,
-  Value: {}
+  IsError: false
 }

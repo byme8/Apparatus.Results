@@ -2,8 +2,8 @@
   executed: true,
   capturedValue: 42,
   result: {
+    Value: 42,
     IsSuccess: true,
-    IsError: false,
-    Value: 42
+    IsError: false
   }
 }

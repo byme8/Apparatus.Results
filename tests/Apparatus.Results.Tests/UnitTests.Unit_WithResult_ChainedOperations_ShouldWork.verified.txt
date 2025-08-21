@@ -1,5 +1,5 @@
 ﻿{
+  Value: Operation completed,
   IsSuccess: true,
-  IsError: false,
-  Value: Operation completed
+  IsError: false
 }

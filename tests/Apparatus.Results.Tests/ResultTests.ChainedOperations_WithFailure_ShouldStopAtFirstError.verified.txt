@@ -1,11 +1,11 @@
 ﻿{
   result: {
-    IsSuccess: false,
-    IsError: true,
     Error: {
       Code: INITIAL,
       Message: Initial error
-    }
+    },
+    IsSuccess: false,
+    IsError: true
   },
   sideEffectExecuted: false
 }

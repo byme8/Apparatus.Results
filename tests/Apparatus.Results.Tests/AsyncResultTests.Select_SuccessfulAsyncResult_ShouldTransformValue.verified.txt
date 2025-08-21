@@ -1,5 +1,5 @@
 ﻿{
+  Value: 10,
   IsSuccess: true,
-  IsError: false,
-  Value: 10
+  IsError: false
 }

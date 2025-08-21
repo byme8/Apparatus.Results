@@ -8,10 +8,5 @@ public static class ModuleInitializer
     public static void Initialize()
     {
         VerifyDiffPlex.Initialize();
-        
-        VerifierSettings.AddExtraSettings(settings =>
-        {
-            settings.Converters.Add(new ResultJsonConverter());
-        });
     }
 }

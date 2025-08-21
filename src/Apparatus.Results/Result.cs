@@ -3,38 +3,60 @@ using System.Diagnostics;
 
 namespace Apparatus.Results;
 
-/// <summary>
-/// Represents the result of an operation that can either succeed with a value of type T or fail with an Error.
-/// This type provides a functional approach to error handling without throwing exceptions.
-/// </summary>
-/// <typeparam name="T">The type of the success value</typeparam>
-[DebuggerDisplay("{IsSuccess ? \"Success: \" + _value : \"Error: \" + _error}")]
-public readonly struct Result<T>
+public readonly struct Result
 {
-    private readonly T? _value;
-    private readonly Error? _error;
-    private readonly bool _isSuccess;
-
-    private Result(T value)
-    {
-        _value = value;
-        _error = null;
-        _isSuccess = true;
-    }
-
-    private Result(Error error)
-    {
-        _value = default;
-        _error = error;
-        _isSuccess = false;
-    }
-
     /// <summary>
     /// Creates a successful result containing the specified value.
     /// </summary>
     /// <param name="value">The success value</param>
     /// <returns>A successful Result containing the value</returns>
-    public static Result<T> Success(T value) => new(value);
+    public static Result<T> Success<T>(T value) => Result<T>.Success(value);
+    
+    public static Result<T> Error<T>(Error error) => Result<T>.Failure(error);
+}
+
+
+/// <summary>
+/// Represents a successful result containing a value of type T.
+/// </summary>
+/// <typeparam name="T">The type of the success value</typeparam>
+[DebuggerDisplay("Success: {Value}")]
+public record Success<T>(T Value) : Result<T>
+{
+    public override string ToString() => $"Success: {Value}";
+}
+
+public interface IFailure
+{
+    public Error Error { get; }
+}
+
+/// <summary>
+/// Represents a failed result containing an Error.
+/// </summary>
+/// <typeparam name="T">The type that would have been returned on success</typeparam>
+[DebuggerDisplay("Error: {Error}")]
+public record Failure<T>(Error Error) : Result<T>, IFailure
+{
+    public override string ToString() => $"Error: {Error}";
+}
+
+/// <summary>
+/// Represents the result of an operation that can either succeed with a value of type T or fail with an Error.
+/// This type provides a functional approach to error handling without throwing exceptions.
+/// </summary>
+/// <typeparam name="T">The type of the success value</typeparam>
+[DebuggerDisplay("{this switch { Success<T> s => $\"Success: {s.Value}\", Failure<T> f => $\"Error: {f.Error}\", _ => \"Unknown\" }}")]
+public abstract record Result<T>
+{
+    /// <summary>
+    /// Creates a successful result containing the specified value.
+    /// </summary>
+    /// <param name="value">The success value</param>
+    /// <returns>A successful Result containing the value</returns>
+    public static Result<T> Success(T value) => new Success<T>(value);
+
+    public static Result<T> Failure(Error error) => new Failure<T>(error);
 
     /// <summary>
     /// Implicitly converts a value to a successful Result.
@@ -46,16 +68,21 @@ public readonly struct Result<T>
     /// Implicitly converts an Error to a failed Result.
     /// </summary>
     /// <param name="error">The error to wrap in a Result</param>
-    public static implicit operator Result<T>(Error error) => new(error);
+    public static implicit operator Result<T>(Error error) => new Failure<T>(error);
 
     /// <summary>
     /// Extracts the value and error from the Result as a tuple.
     /// In the success case, error will be null. In the failure case, value will be default(T).
     /// </summary>
     /// <returns>A tuple containing the value and error</returns>
-    public (T value, Error error) Unwrap()
+    public (T Value, Error Error) Unwrap()
     {
-        return _isSuccess ? (_value!, null!) : (default!, _error!);
+        return this switch
+        {
+            Success<T>(var value) => (value, null!),
+            Failure<T>(var error) => (default!, error),
+            _ => throw new InvalidOperationException("Unknown result type")
+        };
     }
     
     /// <summary>
@@ -65,39 +92,33 @@ public readonly struct Result<T>
     /// <param name="error">The error (null if successful)</param>
     public void Deconstruct(out T value, out Error? error)
     {
-        if (_isSuccess)
+        if (this is Success<T> s)
         {
-            value = _value!;
+            value = s.Value;
             error = null;
+            return;
         }
-        else
+
+        if (this is Failure<T> f)
         {
+            
             value = default!;
-            error = _error;
+            error = f.Error;
+            return;
         }
+        
+        throw new InvalidOperationException("Unknown result type");
     }
 
     /// <summary>
     /// Gets a value indicating whether the result represents a successful operation.
     /// </summary>
-    public bool IsSuccess => _isSuccess;
+    public bool IsSuccess => this is Success<T>;
     
     /// <summary>
     /// Gets a value indicating whether the result represents a failed operation.
     /// </summary>
-    public bool IsError => !_isSuccess;
-
-    /// <summary>
-    /// Gets the success value. Throws an InvalidOperationException if the result is a failure.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown when accessing Value on a failed result</exception>
-    public T Value => _isSuccess ? _value! : throw new InvalidOperationException("Cannot access value of failed result");
-    
-    /// <summary>
-    /// Gets the error. Throws an InvalidOperationException if the result is a success.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown when accessing Error on a successful result</exception>
-    public Error Error => _isSuccess ? throw new InvalidOperationException("Cannot access error of successful result") : _error!;
+    public bool IsError => this is Failure<T>;
 
     /// <summary>
     /// Transforms the success value using the provided function while preserving any error.
@@ -107,7 +128,12 @@ public readonly struct Result<T>
     /// <returns>A new Result with the transformed value or the original error</returns>
     public Result<TOut> Select<TOut>(Func<T, TOut> selector)
     {
-        return _isSuccess ? selector(_value!) : _error!;
+        return this switch
+        {
+            Success<T>(var value) => selector(value),
+            Failure<T>(var error) => error,
+            _ => throw new InvalidOperationException("Unknown result type")
+        };
     }
 
     /// <summary>
@@ -118,7 +144,12 @@ public readonly struct Result<T>
     /// <returns>The result of the resultSelector function or the original error</returns>
     public Result<TOut> SelectMany<TOut>(Func<T, Result<TOut>> resultSelector)
     {
-        return _isSuccess ? resultSelector(_value!) : _error!;
+        return this switch
+        {
+            Success<T>(var value) => resultSelector(value),
+            Failure<T>(var error) => error,
+            _ => throw new InvalidOperationException("Unknown result type")
+        };
     }
 
     /// <summary>
@@ -128,9 +159,9 @@ public readonly struct Result<T>
     /// <returns>The original Result unchanged</returns>
     public Result<T> Do(Action<T> action)
     {
-        if (_isSuccess)
+        if (this is Success<T>(var value))
         {
-            action(_value!);
+            action(value);
         }
         return this;
     }
@@ -142,9 +173,9 @@ public readonly struct Result<T>
     /// <returns>The original Result unchanged</returns>
     public Result<T> DoOnError(Action<Error> action)
     {
-        if (_isSuccess == false)
+        if (this is Failure<T>(var error))
         {
-            action(_error!);
+            action(error);
         }
         return this;
     }
@@ -155,6 +186,11 @@ public readonly struct Result<T>
     /// <returns>A string indicating success with value or error with details</returns>
     public override string ToString()
     {
-        return _isSuccess ? $"Success: {_value}" : $"Error: {_error}";
+        return this switch
+        {
+            Success<T>(var value) => $"Success: {value}",
+            Failure<T>(var error) => $"Error: {error}",
+            _ => "Unknown"
+        };
     }
 }

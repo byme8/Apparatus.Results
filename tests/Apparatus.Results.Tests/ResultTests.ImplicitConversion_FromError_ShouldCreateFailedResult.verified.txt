@@ -1,8 +1,8 @@
 ﻿{
-  IsSuccess: false,
-  IsError: true,
   Error: {
     Code: TEST,
     Message: Test error
-  }
+  },
+  IsSuccess: false,
+  IsError: true
 }

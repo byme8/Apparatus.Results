@@ -1,10 +1,10 @@
 ﻿{
-  IsSuccess: false,
-  IsError: true,
   Error: {
     Field: Name,
     Reason: Required,
     Code: Validation,
     Message: Field 'Name' is invalid: Required
-  }
+  },
+  IsSuccess: false,
+  IsError: true
 }

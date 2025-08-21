@@ -20,10 +20,10 @@ public class PatternMatchingTests
         // Act
         var messages = results.Select(result => result switch
         {
-            { IsSuccess: true } r => $"Success: {r.Value}",
-            { Error: ValidationError ve } => $"Validation failed for {ve.Field}: {ve.Reason}",
-            { Error: NotFoundError nfe } => $"Could not find {nfe.Resource} with ID {nfe.Id}",
-            { Error: var e } => $"Error: {e.Code} - {e.Message}"
+             { IsSuccess: true } r => $"Success: {r.Unwrap().Value}",
+            IFailure { Error: ValidationError ve } => $"Validation failed for {ve.Field}: {ve.Reason}",
+            IFailure { Error: NotFoundError nfe } => $"Could not find {nfe.Resource} with ID {nfe.Id}",
+            IFailure { Error: var e } => $"Error: {e.Code} - {e.Message}"
         }).ToArray();
 
         // Assert
@@ -36,8 +36,8 @@ public class PatternMatchingTests
         // Arrange
         var results = new[]
         {
-            ("Successful case", (Result<int>)42),
-            ("Validation error", (Result<int>)new ValidationError("Age", "Must be positive")),
+            ("Successful case", 42),
+            ("Validation error", new ValidationError("Age", "Must be positive")),
             ("Not found error", (Result<int>)new NotFoundError("User", "999"))
         };
 
@@ -76,9 +76,9 @@ public class PatternMatchingTests
         var analysis = results.Select((result, index) => new
         {
             Index = index,
-            IsSuccess = result.IsSuccess,
-            IsError = result.IsError,
-            Type = result.IsSuccess ? "Success" : result.Error.GetType().Name
+            result.IsSuccess,
+            result.IsError,
+            Type = result.IsSuccess ? "Success" : result.Unwrap().Error.GetType().Name
         }).ToArray();
 
         // Assert
@@ -96,10 +96,10 @@ public class PatternMatchingTests
 
         var conversions = new[]
         {
-            new { Type = "Int Success", IsSuccess = successFromValue.IsSuccess, Value = successFromValue.IsSuccess ? successFromValue.Value.ToString() : null },
-            new { Type = "Int Error", IsSuccess = errorFromError.IsSuccess, Value = errorFromError.IsError ? errorFromError.Error.Code : null },
-            new { Type = "String Success", IsSuccess = successFromString.IsSuccess, Value = successFromString.IsSuccess ? successFromString.Value : null },
-            new { Type = "String Error", IsSuccess = errorFromValidation.IsSuccess, Value = errorFromValidation.IsError ? errorFromValidation.Error.Code : null }
+            new { Type = "Int Success", successFromValue.IsSuccess, Value = successFromValue.IsSuccess ? successFromValue.Unwrap().Value.ToString() : null },
+            new { Type = "Int Error", errorFromError.IsSuccess, Value = errorFromError.IsError ? errorFromError.Unwrap().Error.Code : null },
+            new { Type = "String Success", successFromString.IsSuccess, Value = successFromString.IsSuccess ? successFromString.Unwrap().Value : null },
+            new { Type = "String Error", errorFromValidation.IsSuccess, Value = errorFromValidation.IsError ? errorFromValidation.Unwrap().Error.Code : null }
         };
 
         // Assert
@@ -121,13 +121,13 @@ public class PatternMatchingTests
         // Act
         var outcomes = results.Select(result => result switch
         {
-            { IsSuccess: true } r => $"Processed user: {r.Value.Name}",
-            { Error: ValidationError { Field: "Id" } } => "Invalid user ID provided",
-            { Error: ValidationError { Field: "Email" } } => "Invalid email format",
-            { Error: ValidationError ve } => $"Validation error in {ve.Field}",
-            { Error: NotFoundError } => "User not found in system",
-            { Error: BusinessRuleError bre } => $"Business rule violation: {bre.Rule}",
-            { Error: var e } => $"Unexpected error: {e.Code}"
+            { IsSuccess: true } r => $"Processed user: {r.Unwrap().Value.Name}",
+            IFailure { Error: ValidationError { Field: "Id" } } => "Invalid user ID provided",
+            IFailure { Error: ValidationError { Field: "Email" } } => "Invalid email format",
+            IFailure { Error: ValidationError ve } => $"Validation error in {ve.Field}",
+            IFailure { Error: NotFoundError } => "User not found in system",
+            IFailure { Error: BusinessRuleError bre } => $"Business rule violation: {bre.Rule}",
+            IFailure { Error: var e } => $"Unexpected error: {e.Code}"
         }).ToArray();
 
         // Assert

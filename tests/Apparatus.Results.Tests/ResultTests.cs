@@ -262,27 +262,4 @@ public class ResultTests
         // Assert
         await Verify(new { result = final, sideEffectExecuted });
     }
-
-    [Fact]
-    public async Task Value_AccessOnFailedResult_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var error = new TestError("TEST", "Test error");
-        Result<string> result = error;
-
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => _ = result.Value);
-        await Verify(new { ExceptionMessage = exception.Message });
-    }
-
-    [Fact]
-    public async Task Error_AccessOnSuccessfulResult_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        Result<string> result = "test value";
-
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => _ = result.Error);
-        await Verify(new { ExceptionMessage = exception.Message });
-    }
 }

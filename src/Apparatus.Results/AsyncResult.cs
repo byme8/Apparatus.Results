@@ -33,7 +33,12 @@ public static class AsyncResult
     public static async Task<Result<TOut>> Select<TIn, TOut>(this Task<Result<TIn>> task, Func<TIn, Task<TOut>> selector)
     {
         var result = await task;
-        return result.IsSuccess ? await selector(result.Value) : result.Error;
+        return result switch
+        {
+            Success<TIn>(var value) => await selector(value),
+            Failure<TIn>(var error) => error,
+            _ => throw new InvalidOperationException("Unknown result type")
+        };
     }
 
     /// <summary>
@@ -61,7 +66,12 @@ public static class AsyncResult
     public static async Task<Result<TOut>> SelectMany<TIn, TOut>(this Task<Result<TIn>> task, Func<TIn, Task<Result<TOut>>> resultSelector)
     {
         var result = await task;
-        return result.IsSuccess ? await resultSelector(result.Value) : result.Error;
+        return result switch
+        {
+            Success<TIn>(var value) => await resultSelector(value),
+            Failure<TIn>(var error) => error,
+            _ => throw new InvalidOperationException("Unknown result type")
+        };
     }
 
     /// <summary>
@@ -74,9 +84,9 @@ public static class AsyncResult
     public static async Task<Result<T>> Do<T>(this Task<Result<T>> task, Func<T, Task> action)
     {
         var result = await task;
-        if (result.IsSuccess)
+        if (result is Success<T>(var value))
         {
-            await action(result.Value);
+            await action(value);
         }
         return result;
     }
@@ -91,9 +101,9 @@ public static class AsyncResult
     public static async Task<Result<T>> DoOnError<T>(this Task<Result<T>> task, Func<Error, Task> action)
     {
         var result = await task;
-        if (result.IsError)
+        if (result is Failure<T>(var error))
         {
-            await action(result.Error);
+            await action(error);
         }
         return result;
     }

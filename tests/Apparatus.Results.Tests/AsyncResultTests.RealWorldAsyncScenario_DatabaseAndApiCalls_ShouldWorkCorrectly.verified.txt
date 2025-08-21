@@ -1,8 +1,8 @@
 ﻿{
-  IsSuccess: true,
-  IsError: false,
   Value: {
     UserId: 123,
     Email: User123@example.com
-  }
+  },
+  IsSuccess: true,
+  IsError: false
 }

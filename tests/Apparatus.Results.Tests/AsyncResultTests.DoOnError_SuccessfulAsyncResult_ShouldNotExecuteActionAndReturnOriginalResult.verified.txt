@@ -1,8 +1,8 @@
 ﻿{
   executed: false,
   result: {
+    Value: 42,
     IsSuccess: true,
-    IsError: false,
-    Value: 42
+    IsError: false
   }
 }
