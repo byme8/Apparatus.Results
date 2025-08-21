@@ -48,6 +48,11 @@ Result<User> GetUserById(int id)
     return user;
 }
 
+Result<int> GetData(int id)
+{
+    return new Error("FAIL", "Data fetch failed");
+}
+
 async Task<Result<User>> GetUserByIdAsync(int id)
 {
     await Task.Delay(50); // Simulate async work
