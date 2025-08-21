@@ -1,0 +1,8 @@
+﻿{
+  IsSuccess: false,
+  IsError: true,
+  Error: {
+    Code: UNIT_ERROR,
+    Message: Unit test error
+  }
+}

@@ -10,7 +10,7 @@ namespace Apparatus.Results;
 /// <param name="Code">A unique identifier for the error type</param>
 /// <param name="Message">A human-readable description of the error</param>
 [DebuggerDisplay("{Code}: {Message}")]
-public abstract record Error(string Code, string Message)
+public record Error(string Code, string Message)
 {
     /// <summary>
     /// Implicitly converts an Error to a boolean value.
