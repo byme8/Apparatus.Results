@@ -1,0 +1,11 @@
+﻿{
+  Enumerated: [
+    {
+      count: 3
+    },
+    {
+      taskCode: PRJ-42
+    }
+  ],
+  ErrorType: TestError
+}

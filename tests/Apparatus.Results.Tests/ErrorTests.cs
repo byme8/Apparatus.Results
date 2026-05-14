@@ -104,6 +104,42 @@ public class ErrorTests
     }
 
     [Fact]
+    public Task Error_Extensions_DefaultIsNull()
+    {
+        var error = new TestError("TEST", "msg");
+        return Verify(new { error.Extensions, Enumerated = error.EnumerateExtensions().ToArray() });
+    }
+
+    [Fact]
+    public Task Error_With_ChainsValues()
+    {
+        var error = new TestError("TEST", "msg")
+            .With("taskCode", "PRJ-42")
+            .With("count", 3);
+
+        return Verify(new
+        {
+            Enumerated = error.EnumerateExtensions().OrderBy(kv => kv.Key).ToArray(),
+            ErrorType = error.GetType().Name
+        });
+    }
+
+    [Fact]
+    public Task Error_With_MutatesInPlace()
+    {
+        // .With() mutates the error in place — there is no `Extensions` setter to assign from outside,
+        // and errors are not expected to outlive the throw site.
+        var error = new TestError("TEST", "msg");
+        var returned = error.With("k", "v");
+
+        return Verify(new
+        {
+            SameInstance = ReferenceEquals(error, returned),
+            error.Extensions
+        });
+    }
+
+    [Fact]
     public Task Error_ToString_ShouldProvideReadableFormat()
     {
         // Arrange

@@ -1,0 +1,6 @@
+﻿{
+  SameInstance: true,
+  Extensions: {
+    k: v
+  }
+}
