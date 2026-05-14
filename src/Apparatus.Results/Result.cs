@@ -3,6 +3,9 @@ using System.Diagnostics;
 
 namespace Apparatus.Results;
 
+/// <summary>
+/// Static helpers for constructing <see cref="Result{T}"/> instances without specifying type arguments at the call site.
+/// </summary>
 public readonly struct Result
 {
     /// <summary>
@@ -11,7 +14,13 @@ public readonly struct Result
     /// <param name="value">The success value</param>
     /// <returns>A successful Result containing the value</returns>
     public static Result<T> Success<T>(T value) => Result<T>.Success(value);
-    
+
+    /// <summary>
+    /// Creates a failed result wrapping the given error.
+    /// </summary>
+    /// <typeparam name="T">The type that would have been returned on success.</typeparam>
+    /// <param name="error">The error to wrap.</param>
+    /// <returns>A failed Result containing the error.</returns>
     public static Result<T> Error<T>(Error error) => Result<T>.Failure(error);
 }
 
@@ -23,11 +32,16 @@ public readonly struct Result
 [DebuggerDisplay("Success: {Value}")]
 public record Success<T>(T Value) : Result<T>
 {
+    /// <inheritdoc />
     public override string ToString() => $"Success: {Value}";
 }
 
+/// <summary>
+/// Non-generic view of a failed result, used when pattern-matching failures without knowing the success type.
+/// </summary>
 public interface IFailure
 {
+    /// <summary>The error associated with the failed result.</summary>
     public Error Error { get; }
 }
 
@@ -38,6 +52,7 @@ public interface IFailure
 [DebuggerDisplay("Error: {Error}")]
 public record Failure<T>(Error Error) : Result<T>, IFailure
 {
+    /// <inheritdoc />
     public override string ToString() => $"Error: {Error}";
 }
 
@@ -56,6 +71,11 @@ public abstract record Result<T>
     /// <returns>A successful Result containing the value</returns>
     public static Result<T> Success(T value) => new Success<T>(value);
 
+    /// <summary>
+    /// Creates a failed result wrapping the given error.
+    /// </summary>
+    /// <param name="error">The error to wrap.</param>
+    /// <returns>A failed Result containing the error.</returns>
     public static Result<T> Failure(Error error) => new Failure<T>(error);
 
     /// <summary>
